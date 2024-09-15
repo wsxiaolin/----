@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "physics-lab-web-api": "^0.4.1"
+  }
+}
