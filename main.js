@@ -1,9 +1,10 @@
-const dataPath = "./2024/summer"; // 数据存储的文件姐
+const dataPath = "./2025/winter"; // 数据存储的文件姐
 
 const Pl = require("physics-lab-web-api");
+Pl.setConfig({ consolelog: false });
 const User = Pl.User;
 const projects = require(`${dataPath}/projects.js`);
-const skipUsers = require(`${dataPath}/skipList.js`);
+const skipUsers = new Set(require(`${dataPath}/skipList.js`)); // 确保 skipUsers 是一个 Set 对象
 const list = new Map(); //统计列表，统计每个作品得了哪几票
 const map = new Map(); //统计用户投了几票
 const result = new Map();
@@ -14,9 +15,7 @@ async function isOldTimer(id, pl) {
   const re = await pl.auth.getUser(id);
   return (
     re.Data.Statistic.ExperimentCount >= 10 &&
-    (Date.now() / 1000 - parseInt(id.substring(0, 8), 16)) /
-      (30 * 24 * 60 * 60) >
-      3
+    (Date.now() / 1000 - parseInt(id.substring(0, 8), 16)) / (30 * 24 * 60 * 60) > 3
   );
 }
 
@@ -26,11 +25,7 @@ async function main() {
 
   // 这里先得到每个用户投了几票
   const promises = projects.map(async (item) => {
-    const getSupporters = await pl.projects.getSupporters(
-      item,
-      "Discussion",
-      50
-    );
+    const getSupporters = await pl.projects.getSupporters(item, "Discussion", 50);
     const supports = getSupporters.Data.$values;
     const getSummary = await pl.projects.getSummary(item, "Discussion");
     const author = getSummary.Data.User.ID;
